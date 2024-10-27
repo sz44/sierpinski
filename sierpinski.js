@@ -4,24 +4,48 @@ canvas.height = 400;
 const ctx = canvas.getContext("2d");
 
 // initial points
-let pl = {x: 0, y:400};
-let pm = {x: 200, y:0};
-let pr = {x: 400, y:400};
+let l = {x: 0, y:400};
+let m = {x: 200, y:0};
+let r = {x: 400, y:400};
 
 // draw initial triangle
-drawTriangle(pl, pm, pr);
+drawTriangle(l, m, r);
 
 // get mid points for next tri
-let pMidl = linearInter2(pl, pm, 0.2);
-let pMidt = linearInter2(pl, pr, 0.2);
-let pMidr = linearInter2(pr, pm, 0.8);
-
-drawPoint(pMidl.x, pMidl.y);
-drawPoint(pMidt.x, pMidt.y);
-drawPoint(pMidr.x, pMidr.y);
-
+// let lMid = linearInter2(l, m);
+// let bMid = linearInter2(l, r);
+// let rMid = linearInter2(r, m);
 // draw first sier tri
+// drawTriangle(lMid, bMid, rMid, "red");
 
+sierpinski(l,m,r);
+
+function sierpinski(l, m, r, c = getRandomColor()) {
+    // get mid points for tri
+    let lMid = linearInter2(l, m);
+    let bMid = linearInter2(l, r);
+    let rMid = linearInter2(r, m);
+
+    drawTriangle(lMid,bMid,rMid,c);
+
+    let nextColor = getRandomColor()
+
+    if (r.x - l.x > 10) {
+        // calculate next tris
+        let leftTriL = l;
+        let leftTriM = lMid;
+        let leftTriR = bMid;
+        sierpinski(leftTriL, leftTriM, leftTriR, nextColor);
+        let midTriL = lMid;
+        let midTriM = m;
+        let midTriR = rMid;
+        sierpinski(midTriL, midTriM, midTriR, nextColor);
+        let rightTriL = bMid;
+        let rightTriM = rMid;
+        let rightTriR = r;
+        sierpinski(rightTriL, rightTriM, rightTriR, nextColor);
+    }
+}
 
 function linearInter(x0, x1, pos = 0.5) {
     length = Math.abs(x0-x1); 
@@ -46,11 +70,15 @@ function drawPoint(x, y, r = 20, c = "red") {
     ctx.fill();
 }
 
-function drawTriangle(pl, pm, pr) {
+function drawTriangle(pl, pm, pr, c = "black") {
     ctx.beginPath();
     ctx.moveTo(pl.x, pl.y);
     ctx.lineTo(pm.x, pm.y);
     ctx.lineTo(pr.x, pr.y);
-    ctx.fillStyle = "black";
+    ctx.fillStyle = c;
     ctx.fill();
+}
+
+function getRandomColor() {
+    return `rgb(${Math.random()*255} ${Math.random()*255} ${Math.random()*255})`
 }
